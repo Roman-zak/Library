@@ -16,12 +16,12 @@ namespace Library.Data
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Book>(a =>
+/*            builder.Entity<Book>(a =>
             {
                 a.HasData(
                 new Book { Id = 1, Title = "The Great Gatsby", Cover = "cover", Content = "content", Author = "F. Scott Fitzgerald", Genre = "Classic" }
                 );
-            });
+            });*/
             //  new DbInitializer(builder).Seed();
         }
 

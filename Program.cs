@@ -8,6 +8,7 @@ using Library.Validators;
 using FluentValidation;
 using Library.Dtos;
 using Microsoft.AspNetCore.HttpLogging;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,11 +36,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
+    DbInitializer.SeedData(dbContext);
+}
 app.UseExceptionHandler("/error");
 app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.Use(async (context, next) =>
 {
-    // Log request in a simple format
     var request = context.Request;
     var requestBody = string.Empty;
 
@@ -74,9 +79,9 @@ app.Use(async (context, next) =>
     
     Console.WriteLine(logData);
 
-    // Call the next middleware in the pipeline
     await next();
 });
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
