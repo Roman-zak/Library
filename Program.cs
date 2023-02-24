@@ -4,6 +4,9 @@ using AutoMapper;
 using Microsoft.DotNet.Scaffolding.Shared.ProjectModel;
 using Library.Data;
 using Library.Services;
+using Library.Validators;
+using FluentValidation;
+using Library.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,9 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IValidator<BookSaveDto>, BookSaveDtoValidator>();
+builder.Services.AddScoped<IValidator<ReviewSaveDto>, ReviewSaveDtoValidator>();
+builder.Services.AddScoped<IValidator<RatingSaveDto>, RatingSaveDtoValidator>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
