@@ -70,74 +70,36 @@ namespace Library.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("save")]
-        public async Task<ActionResult<BookDto>> PostBook(BookSaveDto bookSaveDto)
+        public async Task<ActionResult<IdResponceDto>> PostBook(BookSaveDto bookSaveDto)
         {
             // save the book to the repository
             var bookIdDto = await bookService.SaveOrUpdate(bookSaveDto);
             
             return Ok(bookIdDto);
         }
-        /*        [HttpGet("{value}")]
-                public async Task<ActionResult<IEnumerable<BookOverviewDto>>> GetOrderedBooksOverview(string value)
-                {
-                    return Ok(await bookService.GetOrderedBooksOverview(value));
-                }*/
-
-        /*        // GET: api/Books
-                [HttpGet]
-                public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
-                {
-                    IEnumerable<Book> books = await _bookRepository.GetAll();
-                    return books.Select(b => _mapper.Map<BookDto>(b)).ToList();
-                }
-
-                // GET: api/Books/5
-                [HttpGet("{id}")]
-                public async Task<ActionResult<BookDto>> GetBook(int id)
-                {
-                     var book = await _bookRepository.GetById(id);
-
-                    if (book == null)
-                    {
-                        return NotFound();
-                    }
-
-                    return _mapper.Map<BookDto>(book);
-                }
-
-                // PUT: api/Books
-                // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-                [HttpPut]
-                public async Task<IActionResult> PutBook(BookDto bookDto)
-                {
-                    Book book = _mapper.Map<Book>(bookDto);
-                    await _bookRepository.Update(book);
-
-                    return NoContent();
-                }
-
-                // POST: api/Books
-                // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-                [HttpPost]
-                public async Task<ActionResult<BookDto>> PostBook(BookDto bookDto)
-                {
-                    Book book = _mapper.Map<Book>(bookDto);
-                    await _bookRepository.Add(book);
-
-                    return CreatedAtAction("GetBook", new { id = book.Id }, book);
-                }
-
-                // DELETE: api/Books/5
-                [HttpDelete("{id}")]
-                public async Task<IActionResult> DeleteBook(int id)
-                {
-                    if (!_bookRepository.BookExists(id))
-                    {
-                        return NotFound();
-                    }
-                    await _bookRepository.Delete(id);
-
-                    return NoContent();
-                }*/
+        [HttpPut]
+        [Route("{id}/review")]
+        public async Task<ActionResult<IdResponceDto?>> ReviewBook(int id,ReviewSaveDto reviewSaveDto)
+        {
+            // save the book to the repository
+            var reviewIdDto = await bookService.AddReview(id, reviewSaveDto);
+            if(reviewIdDto == null)
+            {
+                return NotFound();
+            }
+            return Ok(reviewIdDto);
+        }
+        [HttpPut]
+        [Route("{id}/rate")]
+        public async Task<ActionResult<IdResponceDto?>> RateBook(int id, RatingSaveDto rateSaveDto)
+        {
+            // save the book to the repository
+            var rateIdDto = await bookService.AddRating(id, rateSaveDto);
+            if (rateIdDto == null)
+            {
+                return NotFound();
+            }
+            return Ok(rateIdDto);
+        }
     }
 }

@@ -35,6 +35,8 @@ namespace Library
                         }))
                 );
             CreateMap<BookSaveDto, Book>();
+            CreateMap<ReviewSaveDto, Review>();
+            CreateMap<RatingSaveDto, Rating>();
 
 
             /*    CreateMap<Review, ReviewDto>()

@@ -4,7 +4,7 @@ namespace Library.Data
 {
     public interface IBookRepository
     {
-        Task<Book> GetById(int id);
+        Task<Book?> GetById(int id);
         Task<IEnumerable<Book>> GetAll();
         Task Add(Book book);
         Task Update(Book book);

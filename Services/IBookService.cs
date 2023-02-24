@@ -4,6 +4,8 @@ namespace Library.Services
 {
     public interface IBookService
     {
+        Task<IdResponceDto?> AddRating(int id, RatingSaveDto rateSaveDto);
+        Task<IdResponceDto?> AddReview(int id, ReviewSaveDto reviewSaveDto);
         Task<bool> BookExists(int id);
         void Delete(int id);
         Task<BookDetalizedDto> GetById(int id);
