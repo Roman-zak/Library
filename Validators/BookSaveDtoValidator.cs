@@ -12,8 +12,8 @@ namespace Library.Validators
                 .MaximumLength(100).WithMessage("Title must be at most 100 characters");
 
             RuleFor(x => x.Cover)
-                .NotEmpty().WithMessage("Cover is required")
-                .Must(IsBase64).WithMessage("Must be base64 string");
+                .NotEmpty().WithMessage("Cover is required");
+     //           .Must(IsBase64).WithMessage("Must be base64 string");
 
             RuleFor(x => x.Content)
                 .NotEmpty().WithMessage("Content is required");

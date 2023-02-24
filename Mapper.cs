@@ -14,11 +14,11 @@ namespace Library
             CreateMap<Book, BookOverviewDto>()
                 .ForMember(
                     dest => dest.Rating,
-                    opt => opt.MapFrom(src => $"{src.Ratings.Average(r=>r.Score)}")
+                    opt => opt.MapFrom(src => (src.Ratings!=null && src.Ratings.Any()) ? src.Ratings.Average(r=>r.Score):0)
                 )
                 .ForMember(
                     dest => dest.ReviewsNumber,
-                    opt => opt.MapFrom(src => $"{src.Reviews.Count}")
+                    opt => opt.MapFrom(src => src.Reviews != null? src.Reviews.Count:0)
                 );
 
             CreateMap<Book, BookDetalizedDto>()
