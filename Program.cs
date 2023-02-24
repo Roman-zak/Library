@@ -35,8 +35,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-/*app.UseExceptionHandler("/error");
-app.UseStatusCodePagesWithReExecute("/error/{0}");*/
+app.UseExceptionHandler("/error");
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 app.Use(async (context, next) =>
 {
     // Log request in a simple format
