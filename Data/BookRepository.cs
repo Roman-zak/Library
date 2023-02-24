@@ -12,14 +12,20 @@ namespace Library.Data
             _dbContext = dbContext;
         }
 
-        public async Task<Book> GetById(int id)
+        public async Task<Book?> GetById(int id)
         {
-            return await _dbContext.Books.FindAsync(id);
+            return await _dbContext.Books
+                .Include(b => b.Reviews)
+                .Include(b => b.Ratings)
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<IEnumerable<Book>> GetAll()
         {
-            return await _dbContext.Books.ToListAsync();
+            return await _dbContext.Books
+                .Include(b => b.Reviews)
+                .Include(b => b.Ratings)
+                .ToListAsync();
         }
 
         public async Task Add(Book book)
@@ -44,5 +50,6 @@ namespace Library.Data
         {
             return await _dbContext.Books.AnyAsync(e => e.Id == id);
         }
+     //   public async void AddReview(int )
     }
 }

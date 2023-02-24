@@ -10,6 +10,9 @@ using AutoMapper;
 using Library.Data;
 using Library.Dtos;
 using Library.Services;
+using Library.Validators;
+using FluentValidation;
+using FluentValidation.Results;
 
 namespace Library.Controllers
 {
@@ -17,19 +20,30 @@ namespace Library.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly IBookService bookService;
+        private readonly IBookService BookService;
         private readonly IConfiguration Configuration;
+        private readonly IValidator<BookSaveDto> BookSaveDtoValidator;
+        private readonly IValidator<ReviewSaveDto> ReviewSaveDtoValidator;
+        private readonly IValidator<RatingSaveDto> RatingSaveDtoValidator;
 
-        public BooksController(IBookService bookService, IConfiguration configuration)
+        public BooksController(IBookService bookService, 
+                                IConfiguration configuration,
+                                IValidator<BookSaveDto> bookSaveDtoValidator,
+                                IValidator<ReviewSaveDto> reviewSaveDtoValidator,
+                                IValidator<RatingSaveDto> ratingSaveDtoValidator)
         {
-            this.bookService = bookService;
-            this.Configuration = configuration;
+            BookService = bookService;
+            Configuration = configuration;
+            BookSaveDtoValidator = bookSaveDtoValidator;
+            ReviewSaveDtoValidator = reviewSaveDtoValidator;
+            RatingSaveDtoValidator = ratingSaveDtoValidator;
         }
+
         // GET: api/Books?order=author
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookOverviewDto>>> GetOrderedBooksOverview([FromQuery]string order)
         {
-            IEnumerable<BookOverviewDto> bookOverviewDtos = await bookService.GetOrderedBooksOverview(order);
+            IEnumerable<BookOverviewDto> bookOverviewDtos = await BookService.GetOrderedBooksOverview(order);
             if(bookOverviewDtos == null)
             {
                 return NotFound();
@@ -40,7 +54,7 @@ namespace Library.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<BookDetalizedDto>> GetBook(int id)
         {
-            BookDetalizedDto bookDetalizedDto = await bookService.GetById(id);
+            BookDetalizedDto bookDetalizedDto = await BookService.GetById(id);
             if (bookDetalizedDto == null)
             {
                 return NotFound();
@@ -57,11 +71,11 @@ namespace Library.Controllers
             {
                 return Forbid();
             }
-            if (!await bookService.BookExists(id))
+            if (!await BookService.BookExists(id))
             {
                 return NotFound();
             }
-            bookService.Delete(id);
+            BookService.Delete(id);
 
             return NoContent();
         }
@@ -70,74 +84,48 @@ namespace Library.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Route("save")]
-        public async Task<ActionResult<BookDto>> PostBook(BookSaveDto bookSaveDto)
+        public async Task<ActionResult<IdResponceDto>> PostBook(BookSaveDto bookSaveDto)
         {
-            // save the book to the repository
-            var bookIdDto = await bookService.SaveOrUpdate(bookSaveDto);
+            ValidationResult result = await BookSaveDtoValidator.ValidateAsync(bookSaveDto);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+            var bookIdDto = await BookService.SaveOrUpdate(bookSaveDto);
             
             return Ok(bookIdDto);
         }
-        /*        [HttpGet("{value}")]
-                public async Task<ActionResult<IEnumerable<BookOverviewDto>>> GetOrderedBooksOverview(string value)
-                {
-                    return Ok(await bookService.GetOrderedBooksOverview(value));
-                }*/
-
-        /*        // GET: api/Books
-                [HttpGet]
-                public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
-                {
-                    IEnumerable<Book> books = await _bookRepository.GetAll();
-                    return books.Select(b => _mapper.Map<BookDto>(b)).ToList();
-                }
-
-                // GET: api/Books/5
-                [HttpGet("{id}")]
-                public async Task<ActionResult<BookDto>> GetBook(int id)
-                {
-                     var book = await _bookRepository.GetById(id);
-
-                    if (book == null)
-                    {
-                        return NotFound();
-                    }
-
-                    return _mapper.Map<BookDto>(book);
-                }
-
-                // PUT: api/Books
-                // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-                [HttpPut]
-                public async Task<IActionResult> PutBook(BookDto bookDto)
-                {
-                    Book book = _mapper.Map<Book>(bookDto);
-                    await _bookRepository.Update(book);
-
-                    return NoContent();
-                }
-
-                // POST: api/Books
-                // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-                [HttpPost]
-                public async Task<ActionResult<BookDto>> PostBook(BookDto bookDto)
-                {
-                    Book book = _mapper.Map<Book>(bookDto);
-                    await _bookRepository.Add(book);
-
-                    return CreatedAtAction("GetBook", new { id = book.Id }, book);
-                }
-
-                // DELETE: api/Books/5
-                [HttpDelete("{id}")]
-                public async Task<IActionResult> DeleteBook(int id)
-                {
-                    if (!_bookRepository.BookExists(id))
-                    {
-                        return NotFound();
-                    }
-                    await _bookRepository.Delete(id);
-
-                    return NoContent();
-                }*/
+        [HttpPut]
+        [Route("{id}/review")]
+        public async Task<ActionResult<IdResponceDto?>> ReviewBook(int id,ReviewSaveDto reviewSaveDto)
+        {
+            ValidationResult result = await ReviewSaveDtoValidator.ValidateAsync(reviewSaveDto);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+            var reviewIdDto = await BookService.AddReview(id, reviewSaveDto);
+            if(reviewIdDto == null)
+            {
+                return NotFound();
+            }
+            return Ok(reviewIdDto);
+        }
+        [HttpPut]
+        [Route("{id}/rate")]
+        public async Task<ActionResult<IdResponceDto?>> RateBook(int id, RatingSaveDto rateSaveDto)
+        {
+            ValidationResult result = await RatingSaveDtoValidator.ValidateAsync(rateSaveDto);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+            var rateIdDto = await BookService.AddRating(id, rateSaveDto);
+            if (rateIdDto == null)
+            {
+                return NotFound();
+            }
+            return Ok(rateIdDto);
+        }
     }
 }
