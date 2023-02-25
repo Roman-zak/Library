@@ -12,7 +12,7 @@ namespace Library.Data
         {
             this.modelBuilder = modelBuilder;
         }
-        public static void SeedData(LibraryDbContext context)
+        public async static void SeedData(LibraryDbContext context)
         {
             var genres = new[]
             {
@@ -58,6 +58,7 @@ namespace Library.Data
                 }
                 books.Add(book);
             }
+            await context.Books.AddRangeAsync(books);
             context.SaveChanges();
         }
     }
